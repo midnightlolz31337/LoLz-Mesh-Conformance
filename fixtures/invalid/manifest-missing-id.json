@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0",
+  "name": "Invalid Synthetic Node",
+  "repository": "https://example.org/invalid-node",
+  "status": "experimental",
+  "updated": "2026-11-22"
+}
