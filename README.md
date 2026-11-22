@@ -17,7 +17,7 @@ python -m mesh_conformance.manifest fixtures/invalid/manifest-missing-id.json
 python -m unittest discover -s tests -v
 ```
 
-The validator checks JSON Schema Draft 2020-12 structure and URI/date formats. The schema snapshot and its upstream commit are recorded in `schemas/SCHEMA-PROVENANCE.md`. Updating the authoritative schema requires a reviewed snapshot update; test runs do not fetch a moving branch.
+The validator checks JSON Schema Draft 2020-12 structure, calendar dates, and absolute HTTPS URLs. URL fields reject non-HTTPS schemes, embedded credentials, malformed ports, and whitespace. Validation is offline and does not fetch referenced URLs. The schema snapshot and its upstream commit are recorded in `schemas/SCHEMA-PROVENANCE.md`. Updating the authoritative schema requires a reviewed snapshot update; test runs do not fetch a moving branch.
 
 ## Planned test domains
 
