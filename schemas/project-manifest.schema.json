@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LoLz Mesh Project Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "name", "repository", "status", "updated"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"},
+    "name": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "format": "uri"},
+    "status": {"enum": ["planned", "bootstrap", "experimental", "active", "maintenance", "archived", "unverified"]},
+    "updated": {"type": "string", "format": "date"},
+    "description": {"type": "string"},
+    "capabilities": {"type": "array", "items": {"type": "string"}},
+    "evidence": {"type": "array", "items": {"type": "object", "required": ["type", "url"], "properties": {"type": {"type": "string"}, "url": {"type": "string", "format": "uri"}, "retrieved": {"type": "string", "format": "date"}}, "additionalProperties": false}}
+  }
+}
