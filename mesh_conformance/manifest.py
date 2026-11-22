@@ -7,6 +7,7 @@ import json
 import sys
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 from jsonschema import Draft202012Validator, FormatChecker
 from jsonschema.exceptions import SchemaError
@@ -20,11 +21,31 @@ def load_json(path: Path) -> Any:
         return json.load(handle)
 
 
+def build_format_checker() -> FormatChecker:
+    """Use explicit absolute-HTTPS semantics for URI fields in this profile."""
+    checker = FormatChecker()
+
+    @checker.checks("uri")
+    def is_absolute_https_uri(value: Any) -> bool:
+        if not isinstance(value, str) or any(character.isspace() for character in value):
+            return False
+        try:
+            parsed = urlsplit(value)
+            return parsed.scheme == "https" and bool(parsed.hostname)
+        except ValueError:
+            return False
+
+    return checker
+
+
 def validate_manifest(document: Any, schema: dict[str, Any] | None = None) -> list[str]:
     """Return sorted, human-readable validation errors; empty means schema-valid."""
     selected_schema = schema if schema is not None else load_json(DEFAULT_SCHEMA)
     Draft202012Validator.check_schema(selected_schema)
-    validator = Draft202012Validator(selected_schema, format_checker=FormatChecker())
+    validator = Draft202012Validator(
+        selected_schema,
+        format_checker=build_format_checker(),
+    )
     errors = []
     for error in validator.iter_errors(document):
         location = ".".join(str(part) for part in error.absolute_path) or "$"
