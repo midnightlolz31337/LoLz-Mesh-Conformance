@@ -22,16 +22,24 @@ def load_json(path: Path) -> Any:
 
 
 def build_format_checker() -> FormatChecker:
-    """Use explicit absolute-HTTPS semantics for URI fields in this profile."""
+    """Require absolute HTTPS URLs without credentials or malformed ports."""
     checker = FormatChecker()
 
     @checker.checks("uri")
     def is_absolute_https_uri(value: Any) -> bool:
-        if not isinstance(value, str) or any(character.isspace() for character in value):
+        if not isinstance(value, str) or not value or any(ch.isspace() for ch in value):
             return False
         try:
             parsed = urlsplit(value)
-            return parsed.scheme == "https" and bool(parsed.hostname)
+            # Accessing .port validates numeric range and syntax.
+            port = parsed.port
+            if parsed.scheme != "https" or not parsed.hostname:
+                return False
+            if parsed.username is not None or parsed.password is not None:
+                return False
+            if parsed.netloc.endswith(":"):
+                return False
+            return port is None or 1 <= port <= 65535
         except ValueError:
             return False
 
